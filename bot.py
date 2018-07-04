@@ -2,6 +2,7 @@ import vk_api
 from vk_api import VkUpload
 from vk_api.longpoll import VkLongPoll, VkEventType
 import requests
+import json
 
 class VKBot:
     """
@@ -13,16 +14,19 @@ class VKBot:
     upload = None
     long_poll = None
     event = None
-    users = set()
+    users = {}
 
-    def __init__(self, token):
+    def __init__(self, token, users = None):
         """
-        Run authorization methods.
-        To choose login type enter token or your login and password.
-        How to get token: https://vk.com/dev/bots_docs
+        Run authorization methods
 
         :param token: your community token
         """
+        if users is None:
+            with open("users.json", "w") as f:
+                pass
+        else:
+            self.users = users
         self.vk_session = vk_api.VkApi(token=token)
         self.vk = self.vk_session.get_api()
         self.session = requests.session()
@@ -30,9 +34,11 @@ class VKBot:
         self.long_poll = VkLongPoll(self.vk_session)
 
 
-    def broadcast_message(self, message):
+    def broadcast_message(self, uid, message):
+        message = f'{uid}: {message}'
         for user in self.users:
-            self.vk.messages.send(user_id=user, message=message)
+            if uid != user:
+                self.vk.messages.send(user_id=user, message=message)
 
     def run(self):
         """
@@ -41,5 +47,8 @@ class VKBot:
         for event in self.long_poll.listen():
             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
                 if event.user_id not in self.users:
-                    self.users.add(event.user_id)
-                self.broadcast_message(event.text)
+                    print(self.users)
+                    self.users[str(event.user_id)] = None
+                    with open("users.json", "w") as f:
+                        json.dump(self.users, f)
+                self.broadcast_message(str(event.user_id), event.text)
