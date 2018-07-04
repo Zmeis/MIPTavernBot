@@ -14,6 +14,7 @@ class VKBot:
     upload = 0
     long_poll = 0
     event = 0
+    users = {}
 
     def __init__(self, log=None, passwd=None, token=None):
         """
@@ -38,25 +39,26 @@ class VKBot:
         self.upload = VkUpload(self.vk_session)
         self.long_poll = VkLongPoll(self.vk_session)
 
-    def __command_handler__(self, commands, handler):
-        """
-        Run user function if message contain a commands
-        :param commands: list of command. For example ["command1", "command2", ...]
-        :param handler: function, that should run if message contain a command
-        """
-        message_set = self.event.text.split(u' ')
-        for command in commands:
-            if command in message_set:
-                handler(self.event, self.vk)
-                break
-
-    def __query_manager__(self, queryset):
-        """
-        Sets a query of commands and handlers
-        :param queryset: list of commands and hanlers. For example [["command", handler], ...]
-        """
-        for item in queryset:
-            self.__command_handler__(item[0], item[1])
+    #
+    # def __command_handler__(self, commands, handler):
+    #     """
+    #     Run user function if message contain a commands
+    #     :param commands: list of command. For example ["command1", "command2", ...]
+    #     :param handler: function, that should run if message contain a command
+    #     """
+    #     message_set = self.event.text.split(u' ')
+    #     for command in commands:
+    #         if command in message_set:
+    #             handler(self.event, self.vk)
+    #             break
+    #
+    # def __query_manager__(self, queryset):
+    #     """
+    #     Sets a query of commands and handlers
+    #     :param queryset: list of commands and hanlers. For example [["command", handler], ...]
+    #     """
+    #     for item in queryset:
+    #         self.__command_handler__(item[0], item[1])
 
     def run(self, query):
         """

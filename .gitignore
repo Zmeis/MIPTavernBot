@@ -2,4 +2,4 @@
 *.json
 *.db
 *.yml
-token
+.token
